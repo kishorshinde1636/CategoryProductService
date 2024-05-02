@@ -22,12 +22,10 @@ public class ProductService {
 	private ProductRepository productRepository;
 
 	public Product createProduct(Product product) {
-		// Check if the category ID provided exists
+
 		Long categoryId = product.getCategory().getId();
 		Category category = categoryRepository.findById(categoryId)
 				.orElseThrow(() -> new CategoryIdNotFoundException("Category not found with id: " + categoryId));
-
-		// Set the category object's name attribute to the retrieved category's name
 		product.getCategory().setName(category.getName());
 
 		return productRepository.save(product);
@@ -39,39 +37,31 @@ public class ProductService {
 
 	public Product getProductById(Long id) {
 		return productRepository.findById(id).map(product -> {
-			product.getCategory(); // Fetch associated category details
+			product.getCategory();
 			return product;
 		}).orElseThrow(() -> new ProductIdNotFoundException("Product not found with id: " + id));
 	}
 
 	public Product updateProductById(Long id, Product product) {
-		// Retrieve the existing product from the database
+
 		Product existingProduct = productRepository.findById(id)
 				.orElseThrow(() -> new ProductIdNotFoundException("Product not found with id: " + id));
 
-		// Update the fields of the existing product with the values from the updated
-		// product
 		existingProduct.setName(product.getName());
 		existingProduct.setPrice(product.getPrice());
 
-		// If the updated product has a category, update the category field of the
-		// existing product
 		if (product.getCategory() != null) {
 			existingProduct.setCategory(product.getCategory());
 		}
 
-		// Save the updated product
 		return productRepository.save(existingProduct);
 	}
 
 	public Product deleteProductById(Long id) {
-		// Find the product to delete
 		Product productToDelete = productRepository.findById(id)
 				.orElseThrow(() -> new ProductIdNotFoundException("Product not found with id: " + id));
 
-		// Delete the product
 		productRepository.deleteById(id);
-
 		// Return the deleted product
 		return productToDelete;
 	}

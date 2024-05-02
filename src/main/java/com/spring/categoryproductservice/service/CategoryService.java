@@ -35,36 +35,27 @@ public class CategoryService {
 	}
 
 	public Category updateCategoryById(Long id, Category category) {
-		// Check if a category with the given ID exists
 		if (categoryRepository.existsById(id)) {
-			// Set the ID of the category to update
 			category.setId(id);
-			// Save the updated category
 			return categoryRepository.save(category);
 		} else {
-			// If no category with the given ID exists, throw a ResourceNotFoundException
 			throw new CategoryIdNotFoundException("Category not found with id: " + id);
 		}
 	}
 
 	public Category deleteCategoryById(Long id) {
-		// Find the category to delete
 		Category categoryToDelete = categoryRepository.findById(id)
 				.orElseThrow(() -> new CategoryIdNotFoundException("Category not found with id: " + id));
 
-		// Get associated products
 		List<Product> products = categoryToDelete.getProducts();
 
-		// Disassociate products from the category
 		for (Product product : products) {
 			product.setCategory(null);
-			productService.updateProductById(product.getId(), product); // Update the product
+			productService.updateProductById(product.getId(), product);
 		}
 
-		// Delete the category
 		categoryRepository.delete(categoryToDelete);
 
-		// Return the deleted category
 		return categoryToDelete;
 	}
 }
